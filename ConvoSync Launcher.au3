@@ -1,13 +1,13 @@
 #NoTrayIcon
-#region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=CS Logo.ico
-#AutoIt3Wrapper_Outfile=ConvoSync Launcher 0_9.exe
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Icon=..\CS Logo.ico
+#AutoIt3Wrapper_Outfile=ConvoSync Launcher 0_10.exe
 #AutoIt3Wrapper_Res_Description=This is the launcher for the ConvoSync Client.
-#AutoIt3Wrapper_Res_Fileversion=0.9.0.0
+#AutoIt3Wrapper_Res_Fileversion=0.10.0.0
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_Field=Launcher Author|Talkarcabbage
 #AutoIt3Wrapper_Res_Field=Program Author|Blir (Random11714)
-#endregion ;**** Directives created by AutoIt3Wrapper_GUI ****
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 #include <TalkysDownloader.au3>
 #include <ButtonConstants.au3>
@@ -38,7 +38,8 @@ $ConvoSyncDir = @AppDataDir & "\ConvoSync"
 $SaveVersion = ""
 $dev = ""
 
-If Not (FileExists($ConvoSyncDir & "\")) Then
+; Initial directory creation and firstrun
+If Not (FileExists($ConvoSyncDir & "\") AND FileExists($ConvoSyncDir & "\Updates\promptupdate.txt")) Then
 	DirCreate(@AppDataDir & "\ConvoSync")
 	DirCreate(@AppDataDir & "\ConvoSync\Updates")
 	DirCreate(@AppDataDir & "\ConvoSync\Updates\Temp\")
@@ -84,8 +85,10 @@ EndIf
 
 
 
-;Check version + compare to server here. If update available, then return true.
+;Check version + compare to server here. If update available, or always prompt, then return true.
 Func UpdateAvailable()
+
+
 	$verBool = _Download("https://raw.github.com/Blir/ConvoSync/dev/src/version.txt", $ConvoSyncDir & "\Updates\versionNew.txt", "", "", False)
 	$versionNew = FileRead($ConvoSyncDir & "\Updates\versionNew.txt")
 	$versionCurrent = FileRead($ConvoSyncDir & "\Updates\versionCurrent.txt")
@@ -136,6 +139,11 @@ Func UpdateAvailable()
 
 	EndIf
 
+
+	if (FileRead($ConvoSyncDir & "\Updates\promptupdate.txt") = "always") Then
+		return True
+	EndIf
+
 	;If an update is available/version mismatch, return true.
 	Return $bool
 EndFunc   ;==>UpdateAvailable
@@ -164,19 +172,22 @@ EndFunc   ;==>UpdateConvoSync
 
 Func UpdatePrompt()
 	GUISetState(@SW_HIDE, $CheckingGui)
-	$Form1 = GUICreate("ConvoSync Launcher", 201, 214)
-	$Label1 = GUICtrlCreateLabel("An update is available for ConvoSync! Version: " & $SaveVersion, 8, 16, 187, 27, 0x01)
+	$Form1 = GUICreate("ConvoSync Launcher", 205, 300)
+	$Label1 = GUICtrlCreateLabel("An update is available for ConvoSync! Version: " & $SaveVersion, 8, 16, 200, 27, 0x01)
 	$Label2 = GUICtrlCreateLabel("Would you like to update?", 40, 50, 128, 17)
 	$Label3 = GUICtrlCreateLabel("Skipping in: 15", 54, 144, 72, 17)
 	$Button1 = GUICtrlCreateButton("Yes", 64, 72, 75, 25)
 	$Button2 = GUICtrlCreateButton("Not Now", 64, 104, 75, 25)
 	$Button3 = GUICtrlCreateButton("No, Don't Ask Again", 40, 168, 123, 25)
+	$Button4 = GuiCtrlCreateButton("Update Every Launch", 40, 200, 125, 25)
+	$Button5 = GUICtrlCreateButton("Reset ConvoSync Folders", 30, 240, 150, 25)
 	GUISetState(@SW_SHOW, $Form1)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "end")
 	GUICtrlSetOnEvent($Button1, "UpdateConvoSync")
 	GUICtrlSetOnEvent($Button2, "RunConvoSync")
 	GUICtrlSetOnEvent($Button3, "NeverUpdate")
-
+	GUICtrlSetOnEvent($Button4, "AlwaysUpdate")
+	GUICtrlSetOnEvent($Button5, "DeleteDirectories")
 	$skip = 0
 	While $skip < 15
 		Sleep(1000)
@@ -186,6 +197,19 @@ Func UpdatePrompt()
 	RunConvoSync()
 
 EndFunc   ;==>UpdatePrompt
+
+func AlwaysUpdate()
+	FileWrite($ConvoSyncDir & "\Updates\promptupdate.txt", "always")
+
+EndFunc
+
+func DeleteDirectories()
+	FileDelete($ConvoSyncDir & "\")
+	FileDelete($ConvoSyncDir & "\Updates\")
+	run(@ScriptFullPath)
+	Exit
+EndFunc
+
 
 Func RunConvoSync()
 
@@ -210,5 +234,15 @@ Func FirstRun()
 	If $ver = 7 Then
 		FileWrite($ConvoSyncDir & "\Updates\DoDev.txt", "true")
 	EndIf
+
+	if (msgbox(68, "Prompt Always", "Click Yes if you would like the launcher to prompt for updates regardless of if one is available.") = 6) then
+		FileWrite($ConvoSyncDir & "\Updates\promptupdate.txt", "always")
+	Else
+		FileWrite($ConvoSyncDir & "\Updates\promptupdate.txt", "true")
+	EndIf
+
+
+
+
 	Local $1fbool = UpdateAvailable()
 EndFunc   ;==>FirstRun
