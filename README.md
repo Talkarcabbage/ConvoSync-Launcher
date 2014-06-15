@@ -1,4 +1,4 @@
-ConvoSync-Launcher
+ConvoSync Launcher
 ==================
 
 An executable for an automatically updating launcher for the ConvoSync client.
