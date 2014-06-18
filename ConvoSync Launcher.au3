@@ -1,6 +1,6 @@
 #NoTrayIcon
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=..\CS Logo.ico
+#AutoIt3Wrapper_Icon=CS Logo.ico
 #AutoIt3Wrapper_Outfile=ConvoSync Launcher 0_10.exe
 #AutoIt3Wrapper_Res_Description=This is the launcher for the ConvoSync Client.
 #AutoIt3Wrapper_Res_Fileversion=0.10.0.0
