@@ -19,7 +19,7 @@
 Global $versionNew
 Global $versionCurrent
 
-Global $devLink = "http://minepop.servegame.com:8080/job/ConvoSync%20Dev%20Build/lastSuccessfulBuild/artifact/dist/ConvoSyncBundle.jar"
+Global $devLink = "http://minepop.us:8080/job/ConvoSync%20Dev%20Build/lastSuccessfulBuild/artifact/dist/ConvoSyncBundle.jar"
 Global $stableLink = "http://api.bukget.org/3/plugins/bukkit/convosync/latest/download"
 
 Opt("GUIOnEventMode", 1)
